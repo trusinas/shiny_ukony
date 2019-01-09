@@ -8,6 +8,8 @@ agendy <- read_rds("output/agendy.rds")
 agenda <- get.data(path)
 test <- tab[1:20,]
 
+tab %>% 
+  anti_join(stazeno, by = c("kod", "platnost"))
 # grafy a statistiky ----------------------------------------------
 
 # údaje - rozdělené na prioritní / vše či ostatní ?:

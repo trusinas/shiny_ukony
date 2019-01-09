@@ -19,7 +19,7 @@
 library(shiny)
 library(shinydashboard)
 
-# source("R/etl.R")
+source("R/etl.R")
 
 # Define sidebar
 sidebar <- dashboardSidebar(
@@ -40,7 +40,7 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
   tabItems(
     tabItem(tabName = "dashboard",
-            h2(paste("Přehled o zpracování údajů v agendách k", stazeno)),
+            h2(paste("Přehled o zpracování údajů v agendách k", stazeno.dne)),
             fluidRow(
               box(title = "Histogram počtu údajů",
               plotOutput("hist1")),

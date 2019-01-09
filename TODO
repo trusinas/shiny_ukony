@@ -1,10 +1,24 @@
 ETL
-  paralelizace importu
-  spojení tab a agendy - pokud bude NA, nelze pomocí hodnoty "kod" - jen cbind ?
+  # paralelizace importu (vyřešeno stahováním pouze změněných agend)
+  spojení tab (či stahnout) a agendy - pokud bude NA, nelze pomocí hodnoty "kod" - jen cbind ?
+  otestovat sloučení stazeno a agendy (rbind(agendy, stazeno))
+    scénař: nrow(agendy) > 0 + nové udaje v agendy nejsou v konfliktu se stazeno
+    scénař: nrow(agendy) > 0 + nové udaje v agendy aktualizují některé agendy ze stazeno
+    
+ZÁVISLOSTI V ETL
+agendy
+- platnost: od kdy je agenda platná = nepracovat s budoucím zněním
+- platnost.do: do kdy je agenda platná = nepracovat s neplatnou
+- prioritní: jaké agendy jsou prioritní - upravit dle mat. na vládu ?
+importy
+- stazeno: kompletní DF s údaji o agendě (9 sloupců) = pokud nedošlo k nové verzi agendy, není nutné ji znovu stahovat
+  ! ukládat úplně nakonec
+- neplatne: agendy, které byly při předchozím importu neplatné = neimportovat
+  ! ukládat než bude použit filter(platnost <= Sys.Date())
+
   
 příprava shiny app
   vhodné způsoby vizualizace
 
 účet na https://www.shinyapps.io/
 
-seznam prioritních agend - importovat
