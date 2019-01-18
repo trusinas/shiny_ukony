@@ -78,7 +78,7 @@ write_rds(agendy, "output/stazeno.rds")
 stazeno.dne <- html %>% 
   html_node("body b") %>%
   html_text() %>% 
-  str_remove(" Rozcestník vygenerovaných agend")
+  str_trunc(10, "right", ellipsis = "")
 
 # DODĚLAT -----------------------------------------------------------------
 # pokud je na webu chyba (chybí excel), skript se zastaví - viz agendy-detail_chyba.html

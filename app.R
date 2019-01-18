@@ -20,6 +20,7 @@ library(shiny)
 library(shinydashboard)
 
 source("R/etl.R")
+# source("R/process.R")
 
 # Define sidebar
 sidebar <- dashboardSidebar(
@@ -42,11 +43,11 @@ body <- dashboardBody(
     tabItem(tabName = "dashboard",
             h2(paste("Přehled o zpracování údajů v agendách k", stazeno.dne)),
             fluidRow(
-              box(title = "Histogram počtu údajů",
-              plotOutput("hist1")),
-              box(title = "Sidebar",
-              sliderInput("bins",
-                          "Number of bins:", 1, 50, 30)))),
+              box(title = "Základní přehled",
+              paste("počet agend:", nrow(agendy)), br(),
+              paste("počet úkonů:", sum(agendy$udaju)), br(),
+              paste("zbývá dnů:", difftime(as.Date("2019-06-30"), Sys.Date()-1))
+              ))),
     tabItem(tabName = "ovm",
             h2("OVM"),
             fluidRow(

@@ -1,15 +1,3 @@
-path <- "data/A944_26062018.xlsx" # 0 úkonů
-path <- "https://rpp-ais.egon.gov.cz/gen/agendy-detail/A28_16102012.xlsx" # 0 úkonů i údajů on-line
-path <- "https://rpp-ais.egon.gov.cz/gen/agendy-detail/A2_06012014.xlsx" # neplatná
-path <- "https://rpp-ais.egon.gov.cz/gen/agendy-detail/A117_01072018.xlsx" # údaje
-
-agendy <- read_rds("output/agendy.rds")
-
-agenda <- get.data(path)
-test <- tab[1:20,]
-
-tab %>% 
-  anti_join(stazeno, by = c("kod", "platnost"))
 # grafy a statistiky ----------------------------------------------
 
 # údaje - rozdělené na prioritní / vše či ostatní ?:
