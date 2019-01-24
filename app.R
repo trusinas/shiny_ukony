@@ -34,7 +34,13 @@ sidebar <- dashboardSidebar(
       text = "OVM",
       tabName = "ovm",
       icon = icon("th")
-    )
+    ),
+    menuItem(
+      text = "Seznam agend",
+      tabName = "seznamagend",
+      icon = icon("columns")
+    ),
+    checkboxInput("checkbox", "Prioritní agendy", value = FALSE, width = NULL)
   )
 )
 # Define body
@@ -51,11 +57,13 @@ body <- dashboardBody(
     tabItem(tabName = "ovm",
             h2("OVM"),
             fluidRow(
-              box(title = "Největší lenoši",
-                  plotOutput("bp1")),
-              box(title = "Zbývá dnů",
-                  difftime(as.Date("2019-06-30"), Sys.Date()))
-            ))))
+            )),
+    tabItem(tabName = "seznamagend",
+          h2("Zbývající agendy"),
+          fluidRow(
+            tableOutput('table.agendy')
+          ))
+  ))
 
 # Define UI for application that draws a histogram
 ui <- dashboardPage(dashboardHeader(title = "Zpracování údajů"), sidebar, body)
@@ -80,6 +88,7 @@ server <- function(input, output) {
       coord_flip() +
       labs(y = "průměrný počet údajů", x = NULL)
   })
+  output$table.agendy <- renderTable(agendy %>% filter(udaju > 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu))
 }
 
 # Run the application 
