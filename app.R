@@ -22,6 +22,9 @@ library(shinydashboard)
 source("R/etl.R")
 # source("R/process.R")
 
+# UI ----------------------------------------------------------------------
+
+
 # Define sidebar
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -57,6 +60,7 @@ body <- dashboardBody(
     tabItem(tabName = "ovm",
             h2("OVM"),
             fluidRow(
+              htmlOutput("n.agend")
             )),
     tabItem(tabName = "seznamagend",
           h2("Zbývající agendy"),
@@ -68,17 +72,12 @@ body <- dashboardBody(
 # Define UI for application that draws a histogram
 ui <- dashboardPage(dashboardHeader(title = "Zpracování údajů"), sidebar, body)
 
+# Server ------------------------------------------------------------------
+
+
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
-  output$hist1 <- renderPlot({
-    # generate bins based on input$bins from ui.R
-    x <- agendy$udaju
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
-  })
   output$bp1 <- renderPlot({
     agendy %>% 
       group_by(usu) %>% 
@@ -88,7 +87,24 @@ server <- function(input, output) {
       coord_flip() +
       labs(y = "průměrný počet údajů", x = NULL)
   })
-  output$table.agendy <- renderTable(agendy %>% filter(udaju > 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu))
+  output$table.agendy <- renderTable({
+    if(input$checkbox == T) {
+      ag.seznam <- agendy %>% filter(udaju > 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+    }
+    if(input$checkbox == F) {
+      ag.seznam <- agendy %>% filter(udaju > 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+    }
+    return(ag.seznam)
+  })
+  output$n.agend <- renderText({
+    if(input$checkbox == T) {
+      n.agend <- agendy %>% filter(prioritni == T) %>% nrow()
+    }
+    if(input$checkbox == F) {
+      n.agend <- nrow(agendy)
+    }
+    paste("počet agend:", n.agend)
+  })
 }
 
 # Run the application 

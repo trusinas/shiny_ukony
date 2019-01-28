@@ -25,6 +25,8 @@ příprava shiny app
 grafický desing dashboardu dle údajů
 filtrování dle prioritních
   viz https://www.linkedin.com/pulse/shiny-app-r-integrating-filter-multiple-dynamic-conditions-lee-rock
+  jako obecný modul pro volání z jiných modulů?
+    agendy <- agendy x agendy <- agendy %>% filter(prioritni == T)
 
 účet na https://www.shinyapps.io/
 
