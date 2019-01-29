@@ -7,6 +7,7 @@ ETL
   předělat neplatné
     ukládat neplatné i s datem a filtrovat anti_join
     zkontrolovat filtrování na neplatné (stažena agenda s budoucím datem neplatnosti)
+  přidat sloupec pořadí (srovnání tabulky)  
   
 ZÁVISLOSTI V ETL
 agendy

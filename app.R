@@ -29,6 +29,11 @@ source("R/etl.R")
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem(
+      text = "Dashboard.bak",
+      tabName = "test",
+      icon = icon("dashboard")
+    ),
+    menuItem(
       text = "Dashboard",
       tabName = "dashboard",
       icon = icon("dashboard")
@@ -49,7 +54,7 @@ sidebar <- dashboardSidebar(
 # Define body
 body <- dashboardBody(
   tabItems(
-    tabItem(tabName = "dashboard",
+    tabItem(tabName = "test",
             h2(paste("Přehled o zpracování údajů v agendách k", stazeno.dne)),
             fluidRow(
               box(title = "Základní přehled",
@@ -57,10 +62,16 @@ body <- dashboardBody(
               paste("počet úkonů:", sum(agendy$udaju)), br(),
               paste("zbývá dnů:", difftime(as.Date("2019-06-30"), Sys.Date()-1))
               ))),
+    tabItem(tabName = "dashboard",
+            h2(paste("Přehled o zpracování údajů v agendách k", stazeno.dne)),
+            fluidRow(title = "Základní přehled",
+                     box(htmlOutput("n.agend")),
+                     box(htmlOutput("n.ukonu")),
+                     box(htmlOutput("n.dnu"))
+            )),
     tabItem(tabName = "ovm",
             h2("OVM"),
             fluidRow(
-              htmlOutput("n.agend")
             )),
     tabItem(tabName = "seznamagend",
           h2("Zbývající agendy"),
@@ -69,13 +80,13 @@ body <- dashboardBody(
           ))
   ))
 
-# Define UI for application that draws a histogram
+# Define UI
 ui <- dashboardPage(dashboardHeader(title = "Zpracování údajů"), sidebar, body)
 
 # Server ------------------------------------------------------------------
 
 
-# Define server logic required to draw a histogram
+# Define server logic
 server <- function(input, output) {
   
   output$bp1 <- renderPlot({
@@ -104,6 +115,24 @@ server <- function(input, output) {
       n.agend <- nrow(agendy)
     }
     paste("počet agend:", n.agend)
+  })
+  output$n.dnu <- renderText({
+    if(input$checkbox == T) {
+      dnu <- difftime(as.Date("2019-02-28"), Sys.Date()-1)
+    }
+    if(input$checkbox == F) {
+      dnu <- difftime(as.Date("2019-06-30"), Sys.Date()-1)
+    }
+    paste("zbývá dnů:", dnu)
+  })
+  output$n.ukonu <- renderText({
+    if(input$checkbox == T) {
+      ukonu <- sum(agendy$udaju[agendy$prioritni == T])
+    }
+    if(input$checkbox == F) {
+      ukonu <- sum(agendy$udaju)
+    }
+    paste("počet úkonů:", ukonu)
   })
 }
 
