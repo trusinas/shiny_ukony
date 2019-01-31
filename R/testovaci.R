@@ -42,5 +42,6 @@ agendy %>%
   geom_col() +
   coord_flip() +
   labs(y = "zpracováno agend", x = NULL) +
-  scale_y_continuous(labels = scales::percent)
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
 # místo názvů zkratky ?

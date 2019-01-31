@@ -18,9 +18,10 @@
   
 library(shiny)
 library(shinydashboard)
+# library(DT)
 
 source("R/etl.R")
-# source("R/process.R")
+source("R/process.R")
 
 # UI ----------------------------------------------------------------------
 
@@ -29,17 +30,12 @@ source("R/etl.R")
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem(
-      text = "Dashboard.bak",
-      tabName = "test",
-      icon = icon("dashboard")
-    ),
-    menuItem(
       text = "Dashboard",
       tabName = "dashboard",
       icon = icon("dashboard")
     ),
     menuItem(
-      text = "OVM",
+      text = "Ohlašovatelé",
       tabName = "ovm",
       icon = icon("th")
     ),
@@ -54,29 +50,23 @@ sidebar <- dashboardSidebar(
 # Define body
 body <- dashboardBody(
   tabItems(
-    tabItem(tabName = "test",
-            h2(paste("Přehled o zpracování údajů v agendách k", stazeno.dne)),
-            fluidRow(
-              box(title = "Základní přehled",
-              paste("počet agend:", nrow(agendy)), br(),
-              paste("počet úkonů:", sum(agendy$udaju)), br(),
-              paste("zbývá dnů:", difftime(as.Date("2019-06-30"), Sys.Date()-1))
-              ))),
     tabItem(tabName = "dashboard",
             h2(paste("Přehled o zpracování údajů v agendách k", stazeno.dne)),
             fluidRow(title = "Základní přehled",
-                     box(htmlOutput("n.agend")),
-                     box(htmlOutput("n.ukonu")),
-                     box(htmlOutput("n.dnu"))
+                     box(htmlOutput("n.agend"), width = 4),
+                     box(htmlOutput("n.ukonu"), width = 4),
+                     box(htmlOutput("n.dnu"), width = 4),
+                     box(htmlOutput("hotovo"), width = 4)
             )),
     tabItem(tabName = "ovm",
-            h2("OVM"),
+            h2("Zpracování dle ohlašovatelů"),
             fluidRow(
+              plotOutput("bp.a.usu")
             )),
     tabItem(tabName = "seznamagend",
           h2("Zbývající agendy"),
           fluidRow(
-            tableOutput('table.agendy')
+            box(DT::DTOutput('table.agendy'), width = 10)
           ))
   ))
 
@@ -89,16 +79,32 @@ ui <- dashboardPage(dashboardHeader(title = "Zpracování údajů"), sidebar, bo
 # Define server logic
 server <- function(input, output) {
   
-  output$bp1 <- renderPlot({
-    agendy %>% 
-      group_by(usu) %>% 
-      summarise(prumer = mean(udaju)) %>% 
-      ggplot(aes(fct_reorder(usu, prumer), prumer)) +
-      geom_col() +
-      coord_flip() +
-      labs(y = "průměrný počet údajů", x = NULL)
+  output$bp.a.usu <- renderPlot({
+    if(input$checkbox == T) {
+      p <- agendy %>% filter(prioritni == T) %>%
+        group_by(usu) %>% 
+        summarise(hotovo = mean(udaju > 0)) %>%
+        ggplot(aes(fct_reorder(usu, hotovo), hotovo)) +
+        geom_col() +
+        coord_flip() +
+        labs(y = "zpracováno agend", x = NULL) +
+        scale_y_continuous(labels = scales::percent) +
+        theme_minimal()
+    }
+    if(input$checkbox == F) {
+      p <- agendy %>% 
+        group_by(usu) %>% 
+        summarise(hotovo = mean(udaju > 0)) %>%
+        ggplot(aes(fct_reorder(usu, hotovo), hotovo)) +
+        geom_col() +
+        coord_flip() +
+        labs(y = "zpracováno agend", x = NULL) +
+        scale_y_continuous(labels = scales::percent) +
+        theme_minimal()
+    }
+    print(p)
   })
-  output$table.agendy <- renderTable({
+  output$table.agendy <- DT::renderDT({
     if(input$checkbox == T) {
       ag.seznam <- agendy %>% filter(udaju > 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
     }
@@ -114,7 +120,7 @@ server <- function(input, output) {
     if(input$checkbox == F) {
       n.agend <- nrow(agendy)
     }
-    paste("počet agend:", n.agend)
+    paste(h2(n.agend), br(), "agend")
   })
   output$n.dnu <- renderText({
     if(input$checkbox == T) {
@@ -123,7 +129,7 @@ server <- function(input, output) {
     if(input$checkbox == F) {
       dnu <- difftime(as.Date("2019-06-30"), Sys.Date()-1)
     }
-    paste("zbývá dnů:", dnu)
+    paste(h2(dnu), br(), "dnů zbývá")
   })
   output$n.ukonu <- renderText({
     if(input$checkbox == T) {
@@ -132,7 +138,21 @@ server <- function(input, output) {
     if(input$checkbox == F) {
       ukonu <- sum(agendy$udaju)
     }
-    paste("počet úkonů:", ukonu)
+    paste(h2(ukonu), br(),"úkonů")
+  })
+  output$hotovo <- renderText({
+    if(input$checkbox == T) {
+      p.hotovo <- agendy %>% 
+        filter(udaju != 0) %>% 
+        filter(prioritni == T) %>% 
+        nrow()/nrow(agendy)*100
+    }
+    if(input$checkbox == F) {
+      p.hotovo <- agendy %>% 
+        filter(udaju != 0) %>% 
+        nrow()/nrow(agendy)*100
+    }
+    paste(h2(round(p.hotovo), "%"), br(), "agend hotovo")
   })
 }
 
