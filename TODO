@@ -1,13 +1,12 @@
 ETL
   # paralelizace importu (vyřešeno stahováním pouze změněných agend)
+  # otestovat sloučení stazeno a agendy (rbind(agendy, stazeno))
+    # scénař: nrow(agendy) > 0 + nové udaje v agendy nejsou v konfliktu se stazeno - ok
+    # scénař: nrow(agendy) > 0 + nové udaje v agendy aktualizují některé agendy ze stazeno - ok (počítá jen max(platnost))
   spojení tab (či stahnout) a agendy - pokud bude NA, nelze pomocí hodnoty "kod" - jen cbind ?
-  otestovat sloučení stazeno a agendy (rbind(agendy, stazeno))
-    scénař: nrow(agendy) > 0 + nové udaje v agendy nejsou v konfliktu se stazeno
-    scénař: nrow(agendy) > 0 + nové udaje v agendy aktualizují některé agendy ze stazeno
   předělat neplatné
     ukládat neplatné i s datem a filtrovat anti_join
     zkontrolovat filtrování na neplatné (stažena agenda s budoucím datem neplatnosti)
-  přidat sloupec pořadí (srovnání tabulky)  
   
 ZÁVISLOSTI V ETL
 agendy

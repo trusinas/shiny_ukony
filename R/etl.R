@@ -2,9 +2,11 @@
 #  načíst https://rpp-ais.egon.gov.cz/gen/agendy-detail/
 #  převést na DF s hodnotami (kód, název, datum, soubor)
 #  omezit na aktuální (<= Sys.Date() a max(datum) pro daný kód)
-#  importovat aktuální do pracovní složky s údaji:
+#  neplatné + bez změny nestahovat
+#  importovat nové do pracovní složky s údaji:
 #   - kód + název + gestor + datum ukončení platnosti agendy
 #   - počet úkonů
+#   - pořadí str_remove("A") %>% as.numeric
 #  minulé (<= Sys.Date()) + uvedeným datem ukončení platnosti, výsledek smazat
 
 library(tidyverse)
@@ -20,7 +22,7 @@ prioritni <- c("A3", "A32", "A42", "A46", "A115", "A117", "A118", "A121",
   "A943", "A963", "A967", "A998", "A1023", "A1025", "A1029", "A1046", 
   "A1086", "A1095", "A1148", "A1154", "A1162", "A1185", "A1186", 
   "A1243", "A1261", "A1341", "A1601", "A1804", "A3082", "A3726", 
-  "A3787", "A3791")
+  "A3787", "A3791") # vypustit A1601 ?
 stazeno <- read_rds("output/stazeno.rds")
 html <- "https://rpp-ais.egon.gov.cz/gen/agendy-detail/" %>% 
   read_html()
@@ -69,11 +71,20 @@ agendy <- agendy.tmp %>%
 
 neplatne <- agendy %>% 
   filter(platnost.do < Sys.Date()) %>% 
-  .$kod %>% 
-  union(neplatne)
+  select(kod, platnost, platnost.do) %>% 
+  rbind(neplatne)
+# dořešit, zda vyhovuje:
+#   1) platná agenda zneplatněna - OK (nebyla v neplatných a nyní přibude)
+#   2) neplatná agenda zplatněna
+#   3) neplatná agenda stále neplatná - OK (není mezi staženými agendami, ale v [neplatne])
+# přeuložit [neplatne] s kod, platnost, platnost.do
+
 write_rds(neplatne, "output/neplatne.rds")
 agendy <- agendy %>%
-  filter(is.na(platnost.do) | platnost.do > Sys.Date())
+  filter(is.na(platnost.do) | platnost.do > Sys.Date()) %>% 
+  mutate(poradi = str_remove(kod, "A") %>% as.numeric()) %>% 
+  arrange(poradi)
+
 write_rds(agendy, "output/stazeno.rds")
 stazeno.dne <- html %>% 
   html_node("body b") %>%
