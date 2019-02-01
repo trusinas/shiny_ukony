@@ -40,11 +40,21 @@ sidebar <- dashboardSidebar(
       icon = icon("th")
     ),
     menuItem(
-      text = "Seznam agend",
+      text = "Hotové agendy",
+      tabName = "seznamagendok",
+      icon = icon("columns")
+    ),
+    menuItem(
+      text = "Zbývající agendy",
       tabName = "seznamagend",
       icon = icon("columns")
     ),
-    checkboxInput("checkbox", "Prioritní agendy", value = FALSE, width = NULL)
+    menuItem(
+      text = "Info",
+      tabName = "info",
+      icon = icon("info")
+    ),
+    checkboxInput("checkbox", "Jen prioritní agendy", value = FALSE, width = NULL)
   )
 )
 # Define body
@@ -52,11 +62,10 @@ body <- dashboardBody(
   tabItems(
     tabItem(tabName = "dashboard",
             h2(paste("Přehled o zpracování údajů v agendách k", stazeno.dne)),
-            fluidRow(title = "Základní přehled",
-                     box(htmlOutput("n.agend"), width = 4),
-                     box(htmlOutput("n.ukonu"), width = 4),
-                     box(htmlOutput("n.dnu"), width = 4),
-                     box(htmlOutput("hotovo"), width = 4)
+            fluidRow(valueBox(uiOutput("n.agend"), "agend", color = "teal", width = 4, icon = icon("business-time")),
+                     valueBox(uiOutput("n.ukonu"), "úkonů", color = "maroon", width = 4, icon = icon("cart-plus"))),
+            fluidRow(valueBox(uiOutput("n.dnu"), "dnů zbývá", color = "light-blue", width = 4, icon = icon("calendar-alt")),
+                     valueBox(uiOutput("hotovo"), "agend hotovo", color = "purple", width = 4, icon = icon("check-circle"))
             )),
     tabItem(tabName = "ovm",
             h2("Zpracování dle ohlašovatelů"),
@@ -64,10 +73,24 @@ body <- dashboardBody(
               plotOutput("bp.a.usu")
             )),
     tabItem(tabName = "seznamagend",
-          h2("Zbývající agendy"),
-          fluidRow(
-            box(DT::DTOutput('table.agendy'), width = 10)
-          ))
+            h2("Zbývající agendy"),
+            fluidRow(
+              box(DT::DTOutput('table.agendy'), width = 10)
+            )),
+    tabItem(tabName = "seznamagendok",
+            h2("Agendy s definovanými úkony"),
+            fluidRow(
+              box(DT::DTOutput('table.agendy.ok'), width = 10)
+            )),
+    tabItem(tabName = "info",
+            h2("Informace"),
+            fluidRow(
+              box("Zdrojem pro zpracování jsou vygenerované XLSX soubory s veřejnými údaji k jednotlivým agendám (https://rpp-ais.egon.gov.cz/gen/agendy-detail/).",
+                  width = 10)),
+            fluidRow(
+              infoBox("Odkaz na GitHub", icon = shiny::icon("github"),
+                      href = "https://github.com/trusinas/shiny_ukony", width = 5, color = "light-blue")
+            ))
   ))
 
 # Define UI
@@ -104,12 +127,21 @@ server <- function(input, output) {
     }
     print(p)
   })
-  output$table.agendy <- DT::renderDT({
+  output$table.agendy.ok <- DT::renderDT({
     if(input$checkbox == T) {
-      ag.seznam <- agendy %>% filter(udaju > 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam.ok <- agendy %>% filter(udaju > 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
     }
     if(input$checkbox == F) {
-      ag.seznam <- agendy %>% filter(udaju > 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam.ok <- agendy %>% filter(udaju > 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+    }
+    return(ag.seznam.ok)
+  })
+  output$table.agendy <- DT::renderDT({
+    if(input$checkbox == T) {
+      ag.seznam <- agendy %>% filter(udaju == 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+    }
+    if(input$checkbox == F) {
+      ag.seznam <- agendy %>% filter(udaju == 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
     }
     return(ag.seznam)
   })
@@ -120,25 +152,25 @@ server <- function(input, output) {
     if(input$checkbox == F) {
       n.agend <- nrow(agendy)
     }
-    paste(h2(n.agend), br(), "agend")
+    return(n.agend)
   })
   output$n.dnu <- renderText({
     if(input$checkbox == T) {
-      dnu <- difftime(as.Date("2019-02-28"), Sys.Date()-1)
+      n.dnu <- difftime(as.Date("2019-02-28"), Sys.Date()-1)
     }
     if(input$checkbox == F) {
-      dnu <- difftime(as.Date("2019-06-30"), Sys.Date()-1)
+      n.dnu <- difftime(as.Date("2019-06-30"), Sys.Date()-1)
     }
-    paste(h2(dnu), br(), "dnů zbývá")
+    return(n.dnu)
   })
   output$n.ukonu <- renderText({
     if(input$checkbox == T) {
-      ukonu <- sum(agendy$udaju[agendy$prioritni == T])
+      n.ukonu <- sum(agendy$udaju[agendy$prioritni == T])
     }
     if(input$checkbox == F) {
-      ukonu <- sum(agendy$udaju)
+      n.ukonu <- sum(agendy$udaju)
     }
-    paste(h2(ukonu), br(),"úkonů")
+    return(n.ukonu)
   })
   output$hotovo <- renderText({
     if(input$checkbox == T) {
@@ -152,7 +184,7 @@ server <- function(input, output) {
         filter(udaju != 0) %>% 
         nrow()/nrow(agendy)*100
     }
-    paste(h2(round(p.hotovo), "%"), br(), "agend hotovo")
+    paste(round(p.hotovo), "%")
   })
 }
 
