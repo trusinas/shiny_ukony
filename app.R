@@ -86,7 +86,9 @@ body <- dashboardBody(
             h2("Informace"),
             fluidRow(
               box(p("Zdrojem pro zpracování jsou vygenerované XLSX soubory s veřejnými údaji k jednotlivým agendám přístupné na adrese", a("https://rpp-ais.egon.gov.cz/gen/agendy-detail/.",
-href = "https://rpp-ais.egon.gov.cz/gen/agendy-detail/")), width = 10)),
+href = "https://rpp-ais.egon.gov.cz/gen/agendy-detail/")),
+p("Aplikace je založena na předpokladu, že v každé agendě existuje alespoň jeden úkon na žádost (typicky právo na poskytnutí údajů vedených v agendě o daném subjektu)."),
+p("Počítán je pouze stav k uvedenému dni (pomíjí budoucí znění)."), width = 10)),
             fluidRow(
               infoBox("Kód na GitHubu", icon = shiny::icon("github"),
                       href = "https://github.com/trusinas/shiny_ukony", width = 5, color = "light-blue")
@@ -106,7 +108,7 @@ server <- function(input, output) {
     if(input$checkbox == T) {
       p <- agendy %>% filter(prioritni == T) %>%
         group_by(usu) %>% 
-        summarise(hotovo = mean(udaju > 0)) %>%
+        summarise(hotovo = mean(ukonu > 0)) %>%
         ggplot(aes(fct_reorder(usu, hotovo), hotovo)) +
         geom_col() +
         coord_flip() +
@@ -117,7 +119,7 @@ server <- function(input, output) {
     if(input$checkbox == F) {
       p <- agendy %>% 
         group_by(usu) %>% 
-        summarise(hotovo = mean(udaju > 0)) %>%
+        summarise(hotovo = mean(ukonu > 0)) %>%
         ggplot(aes(fct_reorder(usu, hotovo), hotovo)) +
         geom_col() +
         coord_flip() +
@@ -129,19 +131,19 @@ server <- function(input, output) {
   })
   output$table.agendy.ok <- DT::renderDT({
     if(input$checkbox == T) {
-      ag.seznam.ok <- agendy %>% filter(udaju > 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam.ok <- agendy %>% filter(ukonu > 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
     }
     if(input$checkbox == F) {
-      ag.seznam.ok <- agendy %>% filter(udaju > 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam.ok <- agendy %>% filter(ukonu > 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
     }
     return(ag.seznam.ok)
   })
   output$table.agendy <- DT::renderDT({
     if(input$checkbox == T) {
-      ag.seznam <- agendy %>% filter(udaju == 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam <- agendy %>% filter(ukonu == 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
     }
     if(input$checkbox == F) {
-      ag.seznam <- agendy %>% filter(udaju == 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam <- agendy %>% filter(ukonu == 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
     }
     return(ag.seznam)
   })
@@ -165,23 +167,23 @@ server <- function(input, output) {
   })
   output$n.ukonu <- renderText({
     if(input$checkbox == T) {
-      n.ukonu <- sum(agendy$udaju[agendy$prioritni == T])
+      n.ukonu <- sum(agendy$ukonu[agendy$prioritni == T])
     }
     if(input$checkbox == F) {
-      n.ukonu <- sum(agendy$udaju)
+      n.ukonu <- sum(agendy$ukonu)
     }
     return(n.ukonu)
   })
   output$hotovo <- renderText({
     if(input$checkbox == T) {
       p.hotovo <- agendy %>% 
-        filter(udaju != 0) %>% 
+        filter(ukonu != 0) %>% 
         filter(prioritni == T) %>% 
-        nrow()/nrow(agendy)*100
+        nrow()/length(prioritni)*100
     }
     if(input$checkbox == F) {
       p.hotovo <- agendy %>% 
-        filter(udaju != 0) %>% 
+        filter(ukonu != 0) %>% 
         nrow()/nrow(agendy)*100
     }
     paste(round(p.hotovo), "%")

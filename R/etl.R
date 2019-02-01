@@ -15,7 +15,7 @@ library(lubridate)
 library(readxl)
 # library(future) - při map(agendy, ~value(.x)): Error: Evaluation error: error reading from the connection.
 
-source("R/func.R")
+source("R/func.R", encoding = 'UTF-8')
 
 prioritni <- c("A3", "A32", "A42", "A46", "A115", "A117", "A118", "A121", 
   "A124", "A385", "A414", "A416", "A419", "A530", "A531", "A565", 
@@ -45,7 +45,7 @@ tab <- tab %>%
   left_join(tab, by = c("kod", "platnost"))
 neplatne <- read_rds("output/neplatne.rds")
 tab <- tab %>% 
-  filter(!kod %in% neplatne)
+  anti_join(neplatne, by = c("kod", "platnost"))
 stahnout <- tab %>%
   anti_join(stazeno, by = c("kod", "platnost"))
 if (nrow(stahnout) > 0) {
