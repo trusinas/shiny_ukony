@@ -85,10 +85,10 @@ body <- dashboardBody(
     tabItem(tabName = "info",
             h2("Informace"),
             fluidRow(
-              box("Zdrojem pro zpracování jsou vygenerované XLSX soubory s veřejnými údaji k jednotlivým agendám (https://rpp-ais.egon.gov.cz/gen/agendy-detail/).",
-                  width = 10)),
+              box(p("Zdrojem pro zpracování jsou vygenerované XLSX soubory s veřejnými údaji k jednotlivým agendám přístupné na adrese", a("https://rpp-ais.egon.gov.cz/gen/agendy-detail/.",
+href = "https://rpp-ais.egon.gov.cz/gen/agendy-detail/")), width = 10)),
             fluidRow(
-              infoBox("Odkaz na GitHub", icon = shiny::icon("github"),
+              infoBox("Kód na GitHubu", icon = shiny::icon("github"),
                       href = "https://github.com/trusinas/shiny_ukony", width = 5, color = "light-blue")
             ))
   ))
