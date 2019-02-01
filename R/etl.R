@@ -51,14 +51,14 @@ stahnout <- tab %>%
 if (nrow(stahnout) > 0) {
   agendy <- map_df(paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", stahnout$soubor),
                    possibly(get.data, data.frame(V1 = NA, V2 = NA, V3 = NA, V4 = NA, V5 = NA, V6 = NA)))
-  names(agendy) <- c("kod", "nazev", "platnost.do", "kod.usu", "usu", "udaju") # ukonu
+  names(agendy) <- c("kod", "nazev", "platnost.do", "kod.usu", "usu", "ukonu")
   agendy <- left_join(stahnout, agendy[,-2], by = "kod")
   agendy <- agendy %>% 
     mutate(prioritni = kod %in% prioritni)
 }
 if (nrow(stahnout) == 0) {
   agendy <- structure(list(kod = character(), nazev = character(), platnost.do = as.Date(character()),
-                          kod.usu = character(), usu = character(), udaju = integer(), platnost = as.Date(character()),
+                          kod.usu = character(), usu = character(), ukonu = integer(), platnost = as.Date(character()),
                       prioritni = logical(), soubor = character()), class = "data.frame")
 }
 
@@ -81,9 +81,7 @@ neplatne <- agendy %>%
 
 write_rds(neplatne, "output/neplatne.rds")
 agendy <- agendy %>%
-  filter(is.na(platnost.do) | platnost.do > Sys.Date()) %>% 
-  mutate(poradi = str_remove(kod, "A") %>% as.numeric()) %>% 
-  arrange(poradi)
+  filter(is.na(platnost.do) | platnost.do > Sys.Date())
 
 write_rds(agendy, "output/stazeno.rds")
 stazeno.dne <- html %>% 
