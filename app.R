@@ -6,15 +6,17 @@
 #
 #    http://shiny.rstudio.com/
 #
-# údaje - rozdělené na prioritní / vše:
+# úkony - rozdělené na prioritní / vše:
 #   k datu
 #   počet agend
 #   % agend s úkony = hotovo
-#   počet úkonů + histogram
+#   počet úkonů
 #   dnů do 30.6.2019 / 28.2.2019
 #   seznam:
 #     zbývajících agend
-#     zbývajících ÚSÚ
+#     hotových agend
+#   graf se stavem:
+#     dle ÚSÚ
   
 library(shiny)
 library(shinydashboard)
@@ -37,17 +39,17 @@ sidebar <- dashboardSidebar(
     menuItem(
       text = "Ohlašovatelé",
       tabName = "ovm",
-      icon = icon("th")
+      icon = icon("chart-bar")
     ),
     menuItem(
       text = "Hotové agendy",
       tabName = "seznamagendok",
-      icon = icon("columns")
+      icon = icon("th-list")
     ),
     menuItem(
       text = "Zbývající agendy",
       tabName = "seznamagend",
-      icon = icon("columns")
+      icon = icon("th-list")
     ),
     menuItem(
       text = "Info",
@@ -61,7 +63,7 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
   tabItems(
     tabItem(tabName = "dashboard",
-            h2(paste("Přehled o zpracování údajů v agendách k", stazeno.dne)),
+            h2(paste("Přehled o zpracování úkonů v agendách k", stazeno.dne)),
             fluidRow(valueBox(uiOutput("n.agend"), "agend", color = "teal", width = 4, icon = icon("business-time")),
                      valueBox(uiOutput("n.ukonu"), "úkonů", color = "maroon", width = 4, icon = icon("cart-plus"))),
             fluidRow(valueBox(uiOutput("n.dnu"), "dnů zbývá", color = "light-blue", width = 4, icon = icon("calendar-alt")),
@@ -96,7 +98,7 @@ p("Počítán je pouze stav k uvedenému dni (pomíjí budoucí znění)."), wid
   ))
 
 # Define UI
-ui <- dashboardPage(dashboardHeader(title = "Zpracování údajů"), sidebar, body)
+ui <- dashboardPage(dashboardHeader(title = "Zpracování úkonů"), sidebar, body)
 
 # Server ------------------------------------------------------------------
 
@@ -113,7 +115,7 @@ server <- function(input, output) {
         geom_col() +
         coord_flip() +
         labs(y = "zpracováno agend", x = NULL) +
-        scale_y_continuous(labels = scales::percent) +
+        scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
         theme_minimal()
     }
     if(input$checkbox == F) {
@@ -124,7 +126,7 @@ server <- function(input, output) {
         geom_col() +
         coord_flip() +
         labs(y = "zpracováno agend", x = NULL) +
-        scale_y_continuous(labels = scales::percent) +
+        scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
         theme_minimal()
     }
     print(p)

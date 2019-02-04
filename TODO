@@ -1,32 +1,12 @@
 ETL
-  # paralelizace importu (vyřešeno stahováním pouze změněných agend)
-  # otestovat sloučení stazeno a agendy (rbind(agendy, stazeno))
-    # scénař: nrow(agendy) > 0 + nové udaje v agendy nejsou v konfliktu se stazeno - ok
-    # scénař: nrow(agendy) > 0 + nové udaje v agendy aktualizují některé agendy ze stazeno - ok (počítá jen max(platnost))
   spojení tab (či stahnout) a agendy - pokud bude NA, nelze pomocí hodnoty "kod" - jen cbind ?
-  předělat neplatné
-    ukládat neplatné i s datem a filtrovat anti_join
-    zkontrolovat filtrování na neplatné (stažena agenda s budoucím datem neplatnosti)
   
-ZÁVISLOSTI V ETL
-agendy
-- platnost: od kdy je agenda platná = nepracovat s budoucím zněním
-- platnost.do: do kdy je agenda platná = nepracovat s neplatnou
-- prioritní: jaké agendy jsou prioritní - upravit dle mat. na vládu ?
-importy
-- stazeno: kompletní DF s údaji o agendě (9 sloupců) = pokud nedošlo k nové verzi agendy, není nutné ji znovu stahovat
-  ! ukládat úplně nakonec
-- neplatne: agendy, které byly při předchozím importu neplatné = neimportovat
-  ! ukládat než bude použit filter(platnost <= Sys.Date())
-
 SHINY  
-příprava shiny app
-  vhodné způsoby vizualizace
-grafický desing dashboardu dle údajů
 filtrování dle prioritních
-  viz https://www.linkedin.com/pulse/shiny-app-r-integrating-filter-multiple-dynamic-conditions-lee-rock
-  jako obecný modul pro volání z jiných modulů?
-    agendy <- agendy x agendy <- agendy %>% filter(prioritni == T)
-
-účet na https://www.shinyapps.io/
+  jako obecný modul pro volání z jiných modulů ?
+  předělat na reactive (výhoda cachovaní) ?
+    viz https://www.linkedin.com/pulse/shiny-app-r-integrating-filter-multiple-dynamic-conditions-lee-rock
+přidat další údaje do dashboardu - viz Dashboard k úkonům (GDoc)
+grafy
+  zkratky ÚSÚ
 

@@ -1,1 +1,12 @@
-﻿shiny aplikace na základní přehled (BI) k úkonům /pro test k údajům vedeným v agendě/
+shiny aplikace na základní přehled (BI) k úkonům
+
+ZÁVISLOSTI V ETL
+agendy
+- platnost: od kdy je agenda platná = nepracovat s budoucím zněním
+- platnost.do: do kdy je agenda platná = nepracovat s neplatnou
+- prioritní: jaké agendy jsou prioritní - upravit dle mat. na vládu ?
+importy
+- stazeno: kompletní DF s údaji o agendě (9 sloupců) = pokud nedošlo k nové verzi agendy, není nutné ji znovu stahovat
+  ! ukládat úplně nakonec
+- neplatne: agendy, které byly při předchozím importu neplatné = neimportovat
+  ! ukládat než bude použit filter(platnost <= Sys.Date())
