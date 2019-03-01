@@ -160,7 +160,7 @@ server <- function(input, output) {
   })
   output$n.dnu <- renderText({
     if(input$checkbox == T) {
-      n.dnu <- difftime(as.Date("2019-02-28"), Sys.Date()-1)
+      n.dnu <- 0
     }
     if(input$checkbox == F) {
       n.dnu <- difftime(as.Date("2019-06-30"), Sys.Date()-1)
