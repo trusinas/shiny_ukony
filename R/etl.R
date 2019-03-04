@@ -23,7 +23,7 @@ prioritni <- c("A3", "A32", "A42", "A46", "A115", "A117", "A118", "A121",
   "A1086", "A1095", "A1148", "A1154", "A1162", "A1185", "A1186", 
   "A1243", "A1261", "A1341", "A1601", "A1804", "A3082", "A3726", 
   "A3787", "A3791") # vypustit A1601 ?
-stazeno <- read_rds("output/stazeno.rds")
+
 html <- "https://rpp-ais.egon.gov.cz/gen/agendy-detail/" %>% 
   read_html()
 tab <- html %>%
@@ -43,11 +43,22 @@ tab <- tab %>%
   group_by(kod) %>%
   summarise(platnost = max(platnost)) %>% 
   left_join(tab, by = c("kod", "platnost"))
-neplatne <- read_rds("output/neplatne.rds")
-tab <- tab %>% 
-  anti_join(neplatne, by = c("kod", "platnost"))
-stahnout <- tab %>%
-  anti_join(stazeno, by = c("kod", "platnost"))
+if(file.exists("output/neplatne.rds")) {
+  neplatne <- read_rds("output/neplatne.rds")
+  tab <- tab %>%
+    anti_join(neplatne, by = c("kod", "platnost"))
+} else neplatne <- data.frame(kod = character(), platnost = as.Date(character()), platnost.do = as.Date(character()))
+if(file.exists("output/stazeno.rds")) {
+  stazeno <- read_rds("output/stazeno.rds")
+  stahnout <- tab %>%
+    anti_join(stazeno, by = c("kod", "platnost"))
+} else {
+  stahnout <- tab
+  stazeno <- structure(list(kod = character(), nazev = character(), platnost.do = as.Date(character()),
+                           kod.usu = character(), usu = character(), ukonu = integer(), platnost = as.Date(character()),
+                           prioritni = logical(), soubor = character()), class = "data.frame")
+}
+
 if (nrow(stahnout) > 0) {
   agendy <- map_df(paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", stahnout$soubor),
                    possibly(get.data, data.frame(V1 = NA, V2 = NA, V3 = NA, V4 = NA, V5 = NA, V6 = NA)))
