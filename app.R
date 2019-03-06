@@ -26,7 +26,8 @@ source("R/etl.R")
 source("R/process.R")
 
 # UI ----------------------------------------------------------------------
-
+agendy.list <- as.list(agendy$kod[agendy$ukonu > 0])
+names(agendy.list) <- paste(agendy$kod[agendy$ukonu > 0], agendy$nazev[agendy$ukonu > 0], sep = " - ")
 
 # Define sidebar
 sidebar <- dashboardSidebar(
@@ -93,7 +94,7 @@ body <- dashboardBody(
             h2("Úkony v agendě"),
             fluidRow(box(
               selectInput("vybranaagenda", h3("Výběr agendy"), 
-                          choices = as.list(agendy$kod[agendy$ukonu > 0]), selected = NULL))),
+                          choices = agendy.list, selected = NULL))),
             fluidRow(
               box(DT::DTOutput('table.ukony'), width = 10)
             )),
