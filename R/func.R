@@ -23,3 +23,23 @@ get.data <- function(path) {
              as.Date(., origin = "1899-12-30"))
   return(agenda.df)
 }
+get.ukony <- function(kod) {
+  path <- paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", tab$soubor[tab$kod == kod])
+  atributy <- c("Název úkonu:", "Komentář úkonu:", "Úkon lze řešit elektronicky:")
+  seznam.ukonu <- readxlsx_url(path, sheet = 5, .name_repair = "universal") %>% 
+    filter(V..Úkony.poskytované.agendou %in% atributy) %>% 
+    select(pole = V..Úkony.poskytované.agendou, hodnota = ...3)
+  if(nrow(seznam.ukonu) > 3) {
+    seznam.ukonu <- unstack(seznam.ukonu, hodnota~pole)
+    names(seznam.ukonu) <- c("komentar", "nazev", "elektronicky")
+  }
+  if(nrow(seznam.ukonu) == 3) {
+    seznam.ukonu <- seznam.ukonu %>%
+      t() %>%
+      as.data.frame()
+    names(seznam.ukonu) <- c("nazev", "komentar", "elektronicky")
+    seznam.ukonu <- seznam.ukonu[-1,]
+    rownames(seznam.ukonu) <- NULL
+  }
+  select(seznam.ukonu, nazev, komentar, elektronicky)
+}

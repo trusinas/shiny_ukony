@@ -52,6 +52,11 @@ sidebar <- dashboardSidebar(
       icon = icon("th-list")
     ),
     menuItem(
+      text = "Přehled úkonů",
+      tabName = "prehledukonu",
+      icon = icon("th-list")
+    ),
+    menuItem(
       text = "Info",
       tabName = "info",
       icon = icon("info")
@@ -84,6 +89,14 @@ body <- dashboardBody(
             fluidRow(
               box(DT::DTOutput('table.agendy.ok'), width = 10)
             )),
+    tabItem(tabName = "prehledukonu",
+            h2("Úkony v agendě"),
+            fluidRow(box(
+              selectInput("vybranaagenda", h3("Výběr agendy"), 
+                          choices = as.list(agendy$kod[agendy$ukonu > 0]), selected = NULL))),
+            fluidRow(
+              box(DT::DTOutput('table.ukony'), width = 10)
+            )),
     tabItem(tabName = "info",
             h2("Informace"),
             fluidRow(
@@ -105,6 +118,9 @@ ui <- dashboardPage(dashboardHeader(title = "Zpracování úkonů"), sidebar, bo
 
 # Define server logic
 server <- function(input, output) {
+  ukony.seznam <- reactive({
+    get.ukony(input$vybranaagenda)
+  })
   
   output$bp.a.usu <- renderPlot({
     if(input$checkbox == T) {
@@ -189,6 +205,10 @@ server <- function(input, output) {
         nrow()/nrow(agendy)*100
     }
     paste(round(p.hotovo), "%")
+  })
+  output$table.ukony <- DT::renderDT({
+    ukony.seznam() %>% 
+      select(název = nazev, komentář = komentar, 'lze elektroniciky' = elektronicky)
   })
 }
 
