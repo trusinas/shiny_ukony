@@ -94,7 +94,7 @@ body <- dashboardBody(
             h2("Úkony v agendě"),
             fluidRow(box(
               selectInput("vybranaagenda", h3("Výběr agendy"), 
-                          choices = agendy.list, selected = NULL))),
+                          choices = agendy.list, selected = NULL), width = 10)),
             fluidRow(
               box(DT::DTOutput('table.ukony'), width = 10)
             )),
