@@ -7,15 +7,16 @@ readxlsx_url <- function(url, ...) {
 #   - kód + název + gestor + datum ukončení platnosti agendy
 #   - počet úkonů
 
-get.data <- function(path) {
-  agenda <- readxlsx_url(path) %>%
-    select(4) %>% 
-    transpose() %>% 
-    unlist() %>% 
-    .[c(2:3, 5, 9:10)]
-  ukonu <- read_excel("tmp.xlsx", sheet = 5, .name_repair = "universal") %>%
-    filter(V..Úkony.poskytované.agendou == "Hlavní atributy úkonu") %>% # ``
-    nrow()
+get.data <- function(file) {
+  url <- paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", file)
+  agenda <- tryCatch(readxlsx_url(url) %>%
+                       select(4) %>% 
+                       transpose() %>% 
+                       unlist() %>% 
+                       .[c(2:3, 5, 9:10)], error = function(e) c(str_extract(file, "A\\d{3,4}"), rep(NA, 4)))
+  ukonu <- tryCatch(read_excel("tmp.xlsx", sheet = 5, .name_repair = "universal") %>%
+                      filter(V..Úkony.poskytované.agendou == "Hlavní atributy úkonu") %>%
+                      nrow(), error = function(e) NA)
   agenda.df <- as.data.frame(matrix(agenda, ncol = 5, byrow = T), stringsAsFactors = F) %>% 
     mutate(V6 = ukonu,
            V3 = V3 %>% 
@@ -23,6 +24,7 @@ get.data <- function(path) {
              as.Date(., origin = "1899-12-30"))
   return(agenda.df)
 }
+
 get.ukony <- function(kod) {
   path <- paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", tab$soubor[tab$kod == kod])
   atributy <- c("Název úkonu:", "Komentář úkonu:", "Úkon lze řešit elektronicky:")

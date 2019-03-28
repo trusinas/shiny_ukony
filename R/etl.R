@@ -62,8 +62,7 @@ if(file.exists("output/stazeno.rds")) {
 }
 
 if (nrow(stahnout) > 0) {
-  agendy <- map_df(paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", stahnout$soubor),
-                   possibly(get.data, data.frame(V1 = NA, V2 = NA, V3 = NA, V4 = NA, V5 = NA, V6 = NA)))
+  agendy <- map_df(stahnout$soubor, get.data)
   names(agendy) <- c("kod", "nazev", "platnost.do", "kod.usu", "usu", "ukonu")
   agendy <- left_join(stahnout, agendy[,-2], by = "kod")
   agendy <- agendy %>% 
