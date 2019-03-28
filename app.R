@@ -26,8 +26,8 @@ source("R/etl.R")
 source("R/process.R")
 
 # UI ----------------------------------------------------------------------
-agendy.list <- as.list(agendy$kod[agendy$ukonu > 0])
-names(agendy.list) <- paste(agendy$kod[agendy$ukonu > 0], agendy$nazev[agendy$ukonu > 0], sep = " - ")
+agendy.list <- as.list(agendy.kody)
+names(agendy.list) <- paste(agendy.kody, agendy.nazvy, sep = " - ")
 
 # Define sidebar
 sidebar <- dashboardSidebar(
@@ -55,6 +55,11 @@ sidebar <- dashboardSidebar(
     menuItem(
       text = "Přehled úkonů",
       tabName = "prehledukonu",
+      icon = icon("th-list")
+    ),
+    menuItem(
+      text = "Agendy bez úkonů",
+      tabName = "agendybez",
       icon = icon("th-list")
     ),
     menuItem(
@@ -97,6 +102,11 @@ body <- dashboardBody(
                           choices = agendy.list, selected = NULL), width = 10)),
             fluidRow(
               box(DT::DTOutput('table.ukony'), width = 10)
+            )),
+    tabItem(tabName = "agendybez",
+            h2("Agendy, ve kterých žádné úkony nejsou"),
+            fluidRow(
+              box(DT::DTOutput('table.agendy.bez.ukonu'), width = 10)
             )),
     tabItem(tabName = "info",
             h2("Informace"),
@@ -210,6 +220,10 @@ server <- function(input, output) {
   output$table.ukony <- DT::renderDT({
     ukony.seznam() %>% 
       select(název = nazev, komentář = komentar, 'lze elektronicky' = elektronicky)
+  })
+  output$table.agendy.bez.ukonu <- DT::renderDT({
+    agendy.bez.ukonu %>% 
+      select(kód = kod, název = nazev, důvod = duvod)
   })
 }
 

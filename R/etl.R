@@ -23,7 +23,9 @@ prioritni <- c("A3", "A32", "A42", "A46", "A115", "A117", "A118", "A121",
   "A1086", "A1095", "A1148", "A1154", "A1162", "A1185", "A1186", 
   "A1243", "A1261", "A1341", "A1601", "A1804", "A3082", "A3726", 
   "A3787", "A3791") # vypustit A1601 ?
-
+if(file.exists("data/agendy.bez.ukonu.csv")) {
+  agendy.bez.ukonu <- read_tsv("data/agendy.bez.ukonu.csv")
+} else agendy.bez.ukonu <- data.frame(kod = character(), nazev = character(), duvod = character())
 html <- "https://rpp-ais.egon.gov.cz/gen/agendy-detail/" %>% 
   read_html()
 tab <- html %>%
