@@ -20,14 +20,12 @@
   
 library(shiny)
 library(shinydashboard)
-# library(DT)
+library(DT)
 
 source("R/etl.R")
 source("R/process.R")
 
 # UI ----------------------------------------------------------------------
-agendy.list <- as.list(agendy.kody)
-names(agendy.list) <- paste(agendy.kody, agendy.nazvy, sep = " - ")
 
 # Define sidebar
 sidebar <- dashboardSidebar(
