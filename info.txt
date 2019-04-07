@@ -1,5 +1,10 @@
 shiny aplikace na základní přehled (BI) k úkonům
 
+POUŽITÉ KNIHOVNY
+app.R - shiny, shinydashboard, DT
+etl.R - tidyverse, rvest, lubridate, readxl
+testy.R - testthat
+
 ZÁVISLOSTI V ETL
 agendy
 - platnost: od kdy je agenda platná = nepracovat s budoucím zněním
@@ -10,3 +15,4 @@ importy
   ! ukládat úplně nakonec
 - neplatne: agendy, které byly při předchozím importu neplatné = neimportovat
   ! ukládat než bude použit filter(platnost <= Sys.Date())
+- agendy.bez.ukonu: manuálně přidávaná data

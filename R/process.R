@@ -15,4 +15,6 @@ agendy.nazvy <- agendy %>% filter(ukonu > 0) %>% .$nazev
 agendy.list <- as.list(agendy.kody)
 names(agendy.list) <- paste(agendy.kody, agendy.nazvy, sep = " - ")
 
+agendy$bez.ukonu <- ifelse(agendy$kod %in% agendy.bez.ukonu$kod, T, F)
+
 # grafy a statistiky ----------------------------------------------
