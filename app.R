@@ -163,7 +163,7 @@ server <- function(input, output) {
       ag.seznam.ok <- agendy %>% filter(ukonu > 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
     }
     return(ag.seznam.ok)
-  })
+  }, options = list(language = list(url = "Czech.json")))
   output$table.agendy <- DT::renderDT({
     if(input$checkbox == T) {
       ag.seznam <- agendy %>% filter(ukonu == 0) %>% filter(prioritni == T) %>% filter(bez.ukonu == F) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
@@ -172,7 +172,7 @@ server <- function(input, output) {
       ag.seznam <- agendy %>% filter(ukonu == 0) %>% filter(bez.ukonu == F) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
     }
     return(ag.seznam)
-  })
+  }, options = list(language = list(url = "Czech.json")))
   output$n.agend <- renderText({
     if(input$checkbox == T) {
       n.agend <- agendy %>% filter(prioritni == T) %>% nrow()
@@ -217,11 +217,11 @@ server <- function(input, output) {
   output$table.ukony <- DT::renderDT({
     ukony.seznam() %>% 
       select(název = nazev, komentář = komentar, 'lze elektronicky' = elektronicky)
-  })
+  }, options = list(language = list(url = "Czech.json")))
   output$table.agendy.bez.ukonu <- DT::renderDT({
     agendy.bez.ukonu %>% 
       select(kód = kod, název = nazev, důvod = duvod)
-  })
+  }, options = list(language = list(url = "Czech.json")))
 }
 
 # Run the application 
