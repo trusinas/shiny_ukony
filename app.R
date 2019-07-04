@@ -183,13 +183,7 @@ server <- function(input, output) {
     return(n.agend)
   })
   output$n.dnu <- renderText({
-    if(input$checkbox == T) {
-      n.dnu <- 0
-    }
-    if(input$checkbox == F) {
-      n.dnu <- difftime(as.Date("2019-06-30"), Sys.Date()-1)
-    }
-    return(n.dnu)
+    n.dnu <- 0
   })
   output$n.ukonu <- renderText({
     if(input$checkbox == T) {
