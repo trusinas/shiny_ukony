@@ -31,10 +31,6 @@ get.ukony <- function(kod) {
   seznam.ukonu <- readxlsx_url(path, sheet = 5, .name_repair = "universal") %>% 
     filter(V..Úkony.poskytované.agendou %in% atributy) %>% 
     select(pole = V..Úkony.poskytované.agendou, hodnota = ...3)
-  if(nrow(seznam.ukonu) > 3) {
-    seznam.ukonu <- unstack(seznam.ukonu, hodnota~pole)
-    names(seznam.ukonu) <- c("komentar", "nazev", "elektronicky")
-  }
   if(nrow(seznam.ukonu) == 3) {
     seznam.ukonu <- seznam.ukonu %>%
       t() %>%
@@ -42,6 +38,10 @@ get.ukony <- function(kod) {
     names(seznam.ukonu) <- c("nazev", "komentar", "elektronicky")
     seznam.ukonu <- seznam.ukonu[-1,]
     rownames(seznam.ukonu) <- NULL
+  }
+  if(nrow(seznam.ukonu) > 3) {
+    seznam.ukonu <- unstack(seznam.ukonu, hodnota~pole)
+    names(seznam.ukonu) <- c("komentar", "nazev", "elektronicky")
   }
   select(seznam.ukonu, nazev, komentar, elektronicky)
 }
