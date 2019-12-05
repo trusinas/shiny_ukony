@@ -101,6 +101,9 @@ stazeno.dne <- html %>%
   html_text() %>% 
   str_trunc(10, "right", ellipsis = "")
 
+agendy.bez.ukonu <- agendy.bez.ukonu %>% 
+  left_join(agendy, by = c("kod", "nazev")) %>% 
+  select(kod, nazev, duvod, usu, soubor)
 # DODĚLAT -----------------------------------------------------------------
 # pokud je na webu chyba (chybí excel), skript se zastaví - viz agendy-detail_chyba.html
 # neplatné vytváří z původního seznamu, takže se opět zastaví

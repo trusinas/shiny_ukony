@@ -157,22 +157,31 @@ server <- function(input, output) {
   })
   output$table.agendy.ok <- DT::renderDT({
     if(input$checkbox == T) {
-      ag.seznam.ok <- agendy %>% filter(ukonu > 0) %>% filter(prioritni == T) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam.ok <- agendy %>% filter(ukonu > 0) %>% filter(prioritni == T)
     }
     if(input$checkbox == F) {
-      ag.seznam.ok <- agendy %>% filter(ukonu > 0) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam.ok <- agendy %>% filter(ukonu > 0)
     }
+    ag.seznam.ok <- ag.seznam.ok %>%
+      mutate(url = paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", soubor)) %>% 
+      mutate(nazev =  paste0("<a  target=_blank href=", url, ">", nazev,"</a>")) %>% 
+      select(kód = kod, název = nazev, ohlašovatel = usu)
+      
     return(ag.seznam.ok)
-  }, options = list(language = list(url = "Czech.json")))
+  }, options = list(language = list(url = "Czech.json")), escape = F)
   output$table.agendy <- DT::renderDT({
     if(input$checkbox == T) {
-      ag.seznam <- agendy %>% filter(ukonu == 0) %>% filter(prioritni == T) %>% filter(bez.ukonu == F) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam <- agendy %>% filter(ukonu == 0) %>% filter(prioritni == T) %>% filter(bez.ukonu == F)
     }
     if(input$checkbox == F) {
-      ag.seznam <- agendy %>% filter(ukonu == 0) %>% filter(bez.ukonu == F) %>% select(kód = kod, název = nazev, ohlašovatel = usu)
+      ag.seznam <- agendy %>% filter(ukonu == 0) %>% filter(bez.ukonu == F)
     }
+    ag.seznam <- ag.seznam %>%
+      mutate(url = paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", soubor)) %>% 
+      mutate(nazev =  paste0("<a  target=_blank href=", url, ">", nazev,"</a>")) %>% 
+      select(kód = kod, název = nazev, ohlašovatel = usu)
     return(ag.seznam)
-  }, options = list(language = list(url = "Czech.json")))
+  }, options = list(language = list(url = "Czech.json")), escape = F)
   output$n.agend <- renderText({
     if(input$checkbox == T) {
       n.agend <- agendy %>% filter(prioritni == T) %>% nrow()
@@ -213,9 +222,11 @@ server <- function(input, output) {
       select(název = nazev, komentář = komentar, 'lze elektronicky' = elektronicky)
   }, options = list(language = list(url = "Czech.json")))
   output$table.agendy.bez.ukonu <- DT::renderDT({
-    agendy.bez.ukonu %>% 
-      select(kód = kod, název = nazev, důvod = duvod)
-  }, options = list(language = list(url = "Czech.json")))
+    agendy.bez.ukonu <- agendy.bez.ukonu %>%
+      mutate(url = paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", soubor)) %>% 
+      mutate(nazev =  paste0("<a  target=_blank href=", url, ">", nazev,"</a>")) %>% 
+      select(kód = kod, název = nazev, ohlašovatel = usu, důvod = duvod)
+  }, options = list(language = list(url = "Czech.json")), escape = F)
 }
 
 # Run the application 
