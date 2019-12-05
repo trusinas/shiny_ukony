@@ -1,0 +1,8 @@
+app.R
+data/agendy.bez.ukonu.csv
+output/neplatne.rds
+output/stazeno.rds
+www/Czech.json
+R/etl.R
+R/func.R
+R/process.R
