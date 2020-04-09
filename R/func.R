@@ -28,9 +28,9 @@ get.data <- function(file) {
 get.ukony <- function(kod) {
   path <- paste0("https://rpp-ais.egon.gov.cz/gen/agendy-detail/", tab$soubor[tab$kod == kod])
   atributy <- c("Název úkonu:", "Komentář úkonu:", "Úkon lze řešit elektronicky:")
-  seznam.ukonu <- readxlsx_url(path, sheet = 5, .name_repair = "universal") %>% 
+  seznam.ukonu <- readxlsx_url(path, sheet = "ÚKONY", .name_repair = "universal") %>% 
     filter(V..Úkony.poskytované.agendou %in% atributy) %>% 
-    select(pole = V..Úkony.poskytované.agendou, hodnota = ...3)
+    select(pole = V..Úkony.poskytované.agendou, hodnota = ...4)
   if(nrow(seznam.ukonu) == 3) {
     seznam.ukonu <- seznam.ukonu %>%
       t() %>%
